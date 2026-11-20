@@ -8,6 +8,8 @@ let KB = null;
 async function initModel() {
   if (ortSession) return ortSession;
   ort.env.wasm.wasmPaths = ORT_WASM_DIR;
+  // GitHub Pages 无 COOP/COEP 头，SharedArrayBuffer 不可用，强制单线程避免回退警告
+  ort.env.wasm.numThreads = 1;
   ortSession = await ort.InferenceSession.create("model.onnx", {
     executionProviders: ["wasm"],
     graphOptimizationLevel: "all",
