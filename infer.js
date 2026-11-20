@@ -10,7 +10,18 @@ async function initModel() {
   ort.env.wasm.wasmPaths = ORT_WASM_DIR;
   // GitHub Pages 无 COOP/COEP 头，SharedArrayBuffer 不可用，强制单线程避免回退警告
   ort.env.wasm.numThreads = 1;
-  ortSession = await ort.InferenceSession.create("model.onnx", {
+  // 模型文件实际是标准 ONNX，仅后缀不同（两份内容完全一致）：
+  //  - model.onnx：GitHub Pages 等常规静态服务器
+  //  - model.wasm：WorkBuddy 内置预览白名单不含 .onnx，需 .wasm 才能放行
+  // 先探测 model.onnx 是否可用，不可用则回退到 model.wasm。
+  let modelUrl = "model.onnx";
+  try {
+    const probe = await fetch(modelUrl, { method: "HEAD" });
+    if (!probe.ok) modelUrl = "model.wasm";
+  } catch (_) {
+    modelUrl = "model.wasm";
+  }
+  ortSession = await ort.InferenceSession.create(modelUrl, {
     executionProviders: ["wasm"],
     graphOptimizationLevel: "all",
   });
