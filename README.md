@@ -5,7 +5,7 @@
 
 ## 🌐 在线体验（GitHub Pages，无需安装）
 
-**https://1301861423-source.github.io/soybean-disease-detection/**
+**https://Pengke007.github.io/soybean-disease-detection/**
 
 这是一个**纯静态网页**：AI 模型已转为 ONNX 格式，识别完全在浏览器内完成，图片不上传服务器，手机/电脑浏览器打开即可用。网页源码在 `web/` 目录，由 `gh-pages` 分支托管。
 
