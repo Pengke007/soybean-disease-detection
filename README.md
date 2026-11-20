@@ -1,7 +1,13 @@
 # 🌱 SoyGuard 大豆病害智能识别
 
-一个基于深度学习的大豆叶片病害识别系统，支持**网页端**与**微信小程序**两种形态。
+一个基于深度学习的大豆叶片病害识别系统，支持**在线网页**、**本地网页**与**微信小程序**多种形态。
 用户拍摄/上传大豆叶片照片，系统返回病害类别、置信度、症状特征、易混淆区分与科学防治建议。
+
+## 🌐 在线体验（GitHub Pages，无需安装）
+
+**https://1301861423-source.github.io/soybean-disease-detection/**
+
+这是一个**纯静态网页**：AI 模型已转为 ONNX 格式，识别完全在浏览器内完成，图片不上传服务器，手机/电脑浏览器打开即可用。网页源码在 `web/` 目录，由 `gh-pages` 分支托管。
 
 ---
 
@@ -15,7 +21,13 @@ soybean-app/
 │   ├── prepare_data.py      # 将 parquet 数据集导出为图片并按类别划分
 │   └── train.py             # MobileNetV3 迁移学习训练脚本
 ├── frontend/
-│   └── index.html           # 网页前端（拍照/上传/拖拽/粘贴识别）
+│   └── index.html           # 网页前端（配合本地 Flask 后端使用）
+├── web/                     # 🌐 纯静态在线网页（GitHub Pages 部署用）
+│   ├── index.html           # 在线页面（浏览器内 ONNX 推理）
+│   ├── infer.js             # 图片预处理 + onnxruntime-web 推理逻辑
+│   ├── knowledge.json       # 内嵌的病害知识库
+│   ├── model.onnx           # 浏览器可运行的模型（6.1MB）
+│   └── ort/                 # onnxruntime-web 运行时（wasm）
 ├── miniprogram/             # 微信小程序工程（可直接用微信开发者工具打开）
 │   ├── app.js / app.json / app.wxss
 │   ├── pages/index/         # 识别页

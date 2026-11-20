@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大豆病害智能识别 · SoyGuard</title>
+<style>
+  :root{
+    --green:#1f7a4d; --green-d:#155c39; --green-l:#e8f5ee;
+    --amber:#e08a1e; --bg:#f4f8f5; --card:#ffffff; --text:#1d2b23; --muted:#63756a;
+    --border:#dfeae3; --shadow:0 8px 30px rgba(31,122,77,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  header{background:#1f7a4d;color:#fff;padding:26px 0 60px;position:relative;overflow:hidden}
+  .brand{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:700;letter-spacing:.5px}
+  .brand .logo{width:40px;height:40px;background:#fff;border-radius:12px;display:grid;place-items:center;font-size:22px}
+  .hero{margin-top:26px;max-width:640px}
+  .hero h1{font-size:34px;line-height:1.3;margin-bottom:10px}
+  .hero p{opacity:.92;font-size:15px}
+  .badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .badge{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);padding:4px 12px;border-radius:20px;font-size:12px}
+  main{margin-top:-36px;position:relative;z-index:2}
+  .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:22px}
+  .card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);border:1px solid var(--border);padding:26px}
+  .card h2{font-size:18px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .card .sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+  .drop{border:2px dashed #b9d8c6;border-radius:14px;background:#fafdfb;min-height:230px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:.2s;text-align:center;padding:20px}
+  .drop:hover,.drop.drag{border-color:var(--green);background:var(--green-l)}
+  .drop .icon{font-size:46px;margin-bottom:8px}
+  .drop .t{font-weight:600;font-size:15px}
+  .drop .s{color:var(--muted);font-size:12px;margin-top:4px}
+  .preview{width:100%;max-height:230px;object-fit:contain;border-radius:12px;display:none;margin-top:14px}
+  .btns{display:flex;gap:10px;margin-top:16px}
+  button{border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;border-radius:10px;padding:11px 20px;transition:.2s}
+  .btn-primary{background:var(--green);color:#fff;flex:1}
+  .btn-primary:hover{background:var(--green-d)}
+  .btn-primary:disabled{opacity:.55;cursor:not-allowed}
+  .btn-ghost{background:var(--green-l);color:var(--green-d)}
+  .tip{font-size:12px;color:var(--muted);margin-top:12px;display:flex;gap:6px;align-items:flex-start}
+  .result-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:320px;color:var(--muted);text-align:center;gap:10px}
+  .result-empty .icon{font-size:48px;opacity:.5}
+  .result{display:none}
+  .diag{display:flex;gap:16px;align-items:center;padding:16px;border-radius:14px;background:var(--green-l);margin-bottom:16px}
+  .diag .emoji{font-size:40px;width:64px;height:64px;display:grid;place-items:center;background:#fff;border-radius:14px;flex-shrink:0}
+  .diag .name{font-size:22px;font-weight:700}
+  .diag .en{color:var(--muted);font-size:12px}
+  .conf{margin-left:auto;text-align:right}
+  .conf .num{font-size:26px;font-weight:800;color:var(--green)}
+  .conf .lab{font-size:11px;color:var(--muted)}
+  .bar{height:7px;background:#dcebe2;border-radius:6px;overflow:hidden;margin:4px 0 16px}
+  .bar>i{display:block;height:100%;background:#1f7a4d;border-radius:6px;transition:width .6s}
+  .cand{display:flex;flex-direction:column;gap:7px;margin-bottom:18px}
+  .cand .row{display:flex;align-items:center;gap:10px;font-size:13px}
+  .cand .row .n{width:96px;color:var(--muted)}
+  .cand .row .b{flex:1;height:6px;background:#eef3ef;border-radius:5px;overflow:hidden}
+  .cand .row .b>i{display:block;height:100%;background:#8fc5a6}
+  .cand .row .p{width:46px;text-align:right;color:var(--muted)}
+  .sec{margin-top:16px}
+  .sec h3{font-size:14px;margin-bottom:8px;padding-left:10px;border-left:3px solid var(--green)}
+  .sec p{font-size:13.5px;color:#39473e}
+  .sec ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+  .sec li{font-size:13.5px;color:#39473e;padding-left:24px;position:relative}
+  .sec li::before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:700}
+  .warn{background:#fff8ec;border:1px solid #f3e0bf;color:#8a651f;padding:10px 14px;border-radius:10px;font-size:12.5px;margin-top:14px}
+  .mode-tag{display:inline-block;font-size:11px;padding:2px 9px;border-radius:12px;background:#e8f5ee;color:#1f7a4d;margin-left:8px}
+  .status{background:#e8f5ee;color:#1f7a4d;padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .status.loading{background:#fff8ec;color:#8a651f}
+  .status.error{background:#fdecec;color:#a32d2d}
+  .section-title{text-align:center;margin:46px 0 22px}
+  .section-title h2{font-size:24px}
+  .section-title p{color:var(--muted);font-size:14px;margin-top:6px}
+  .lib{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding-bottom:50px}
+  .dis{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+  .dis .top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .dis .ic{font-size:26px}
+  .dis .nm{font-weight:700;font-size:15px}
+  .dis .tp{font-size:11px;color:var(--muted);margin-top:2px}
+  .dis .ds{font-size:12.5px;color:#5b6b61;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  footer{background:#123d29;color:#cfe3d6;text-align:center;padding:22px 20px;font-size:12.5px}
+  .loading{display:inline-block;width:16px;height:16px;border:2px solid rgba(31,122,77,.3);border-top-color:#1f7a4d;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}.lib{grid-template-columns:repeat(2,1fr)}.hero h1{font-size:27px}.diag{flex-wrap:wrap}.conf{margin-left:0;text-align:left;width:100%}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand"><div class="logo">🌱</div><span>SoyGuard 大豆病害智能识别</span></div>
+    <div class="hero">
+      <h1>拍一张叶片照片，<br>快速识别大豆病害</h1>
+      <p>基于深度学习图像识别模型，覆盖大豆常见病害，给出识别结果、症状特征与科学防治建议。全部识别在您的浏览器内完成，无需上传图片。</p>
+      <div class="badges">
+        <span class="badge">🧠 深度学习模型</span>
+        <span class="badge">📷 拍照 / 上传</span>
+        <span class="badge">🌾 常见病害全覆盖</span>
+        <span class="badge">💊 防治建议</span>
+        <span class="badge">🔒 本地识别 · 隐私保护</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+    <section class="card">
+      <h2>📤 上传叶片图片</h2>
+      <p class="sub">支持 JPG / PNG 格式，建议使用清晰、对焦准确的叶片特写</p>
+      <div class="status loading" id="status"><span class="loading"></span><span id="statusText">正在加载 AI 模型（约 6MB）…</span></div>
+      <div class="drop" id="drop">
+        <div class="icon">🖼️</div>
+        <div class="t">点击选择图片，或拖拽到此处</div>
+        <div class="s">也可以直接粘贴截图（Ctrl+V）</div>
+      </div>
+      <input type="file" id="file" accept="image/*" hidden>
+      <img class="preview" id="preview" alt="预览">
+      <div class="btns">
+        <button class="btn-primary" id="detect" disabled>🔍 开始识别</button>
+        <button class="btn-ghost" id="clear">清空</button>
+      </div>
+      <div class="tip">💡 <span>拍摄建议：选择症状典型的叶片，尽量填满画面，避免强光反射和严重模糊；锈病请同时拍摄叶片背面。</span></div>
+    </section>
+
+    <section class="card">
+      <h2>📋 识别结果 <span class="mode-tag" id="modeTag" style="display:none">本地模型</span></h2>
+      <p class="sub">识别结果仅供参考，田间确诊请结合实地症状或咨询农技人员</p>
+      <div class="result-empty" id="empty">
+        <div class="icon">🌿</div>
+        <div>上传图片并点击「开始识别」<br>结果将在这里展示</div>
+      </div>
+      <div class="result" id="result">
+        <div class="diag">
+          <div class="emoji" id="emoji">🍄</div>
+          <div>
+            <div class="name" id="name">—</div>
+            <div class="en" id="en">—</div>
+          </div>
+          <div class="conf"><div class="num" id="conf">—</div><div class="lab">置信度</div></div>
+        </div>
+        <div class="bar"><i id="confBar" style="width:0"></i></div>
+        <div class="cand" id="cand"></div>
+        <div class="sec"><h3>🔬 病原与类型</h3><p id="pathogen">—</p></div>
+        <div class="sec"><h3>👀 症状识别要点</h3><p id="symptoms">—</p></div>
+        <div class="sec" id="confusionWrap"><h3>⚖️ 易混淆区分</h3><p id="confusion">—</p></div>
+        <div class="sec"><h3>💊 防治建议</h3><ul id="control"></ul></div>
+        <div class="warn">⚠️ 识别结果仅供参考，实际防治请遵循当地农技部门指导。</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="section-title">
+    <h2>🌾 大豆常见病害图鉴</h2>
+    <p>点击卡片查看病害详情与防治要点</p>
+  </div>
+  <div class="lib" id="lib"></div>
+</main>
+
+<footer>
+  SoyGuard 大豆病害智能识别 · 浏览器本地推理，图片不上传服务器 · 数据集来源：公开农业图像数据集（CC BY 4.0）
+</footer>
+
+<script src="ort/ort.min.js"></script>
+<script src="infer.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const drop=$('drop'), file=$('file'), preview=$('preview'), detect=$('detect');
+let currentImg = null;
+
+function setStatus(text, cls){
+  $('status').className = 'status ' + (cls||'');
+  $('status').innerHTML = (cls==='loading'?'<span class="loading"></span>':'') + '<span>'+text+'</span>';
+}
+
+async function boot(){
+  try{
+    await Promise.all([initModel(), loadKnowledge()]);
+    setStatus('✓ AI 模型已就绪，可开始识别', '');
+    detect.disabled = !currentImg;
+    loadLib();
+  }catch(err){
+    setStatus('模型加载失败：'+err.message, 'error');
+    console.error(err);
+  }
+}
+
+function loadFile(f){
+  if(!f || !f.type.startsWith('image/')) return;
+  const img = new Image();
+  img.onload = () => {
+    currentImg = img;
+    preview.src = img.src;
+    preview.style.display = 'block';
+    detect.disabled = !ortSession;
+  };
+  img.src = URL.createObjectURL(f);
+}
+drop.onclick=()=>file.click();
+drop.ondragover=e=>{e.preventDefault();drop.classList.add('drag')};
+drop.ondragleave=()=>drop.classList.remove('drag');
+drop.ondrop=e=>{e.preventDefault();drop.classList.remove('drag');loadFile(e.dataTransfer.files[0])};
+file.onchange=e=>loadFile(e.target.files[0]);
+document.addEventListener('paste',e=>{const items=e.clipboardData.items;for(const it of items){if(it.type.startsWith('image/')){loadFile(it.getAsFile());break}}});
+$('clear').onclick=()=>{currentImg=null;preview.style.display='none';detect.disabled=!$('detect').disabled;detect.disabled=true;$('result').style.display='none';$('empty').style.display='flex';};
+
+$('detect').onclick=async()=>{
+  if(!currentImg) return;
+  detect.disabled=true;
+  const old=detect.textContent;
+  detect.innerHTML='<span class="loading"></span>识别中...';
+  try{
+    const data=await predict(currentImg);
+    showResult(data);
+  }catch(err){ alert('识别失败：'+err.message); console.error(err); }
+  finally{ detect.disabled=false; detect.textContent=old||'🔍 重新识别'; }
+};
+
+function showResult(d){
+  $('empty').style.display='none'; $('result').style.display='block';
+  const t=d.top, info=d.detail||{};
+  $('emoji').textContent=info.emoji||'🌿';
+  $('name').textContent=t.name_zh||t.class;
+  $('en').textContent=info.name_en||t.class;
+  $('conf').textContent=t.confidence+'%';
+  $('confBar').style.width=t.confidence+'%';
+  $('pathogen').textContent=(info.pathogen||'—')+(info.type?' · '+info.type:'');
+  $('symptoms').textContent=info.symptoms||'—';
+  $('confusion').textContent=info.confusion||'暂无';
+  $('confusionWrap').style.display=info.confusion?'block':'none';
+  $('control').innerHTML=(info.control||[]).map(x=>`<li>${x}</li>`).join('');
+  $('modeTag').style.display='inline-block';
+  const cand=$('cand'); cand.innerHTML='';
+  (d.candidates||[]).slice(0,4).forEach(c=>{
+    const row=document.createElement('div');row.className='row';
+    row.innerHTML=`<span class="n">${c.name_zh||c.class}</span><span class="b"><i style="width:${c.confidence}%"></i></span><span class="p">${c.confidence}%</span>`;
+    cand.appendChild(row);
+  });
+}
+
+function loadLib(){
+  const lib=$('lib');
+  const trained=new Set(KB.classes);
+  Object.entries(KB.info).forEach(([k,v])=>{
+    const tag = trained.has(k) ? '可识别' : '科普';
+    const el=document.createElement('div');el.className='dis';
+    el.innerHTML=`<div class="top"><span class="ic">${v.emoji||'🌿'}</span><div><div class="nm">${v.name_zh}</div><div class="tp">${v.type||''} · ${tag}</div></div></div><div class="ds">${v.symptoms||''}</div>`;
+    lib.appendChild(el);
+  });
+}
+
+boot();
+</script>
+</body>
+</html>
