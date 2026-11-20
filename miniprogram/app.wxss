@@ -1,0 +1,30 @@
+page {
+  --green: #1f7a4d;
+  --green-d: #155c39;
+  --green-l: #e8f5ee;
+  --bg: #f4f8f5;
+  --text: #1d2b23;
+  --muted: #7a8b80;
+  --border: #e3ece6;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+.card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin: 24rpx;
+  box-shadow: 0 8rpx 30rpx rgba(31,122,77,.07);
+}
+.title { font-size: 34rpx; font-weight: 700; }
+.sub { font-size: 24rpx; color: var(--muted); }
+.btn-primary {
+  background: var(--green); color: #fff; border-radius: 16rpx;
+  font-size: 30rpx; font-weight: 600; padding: 20rpx 0;
+}
+.btn-primary::after { border: none; }
+.tag {
+  display: inline-block; font-size: 22rpx; padding: 6rpx 18rpx;
+  border-radius: 24rpx; background: var(--green-l); color: var(--green-d);
+}

@@ -1,0 +1,26 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/library/library",
+    "pages/detail/detail"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#1f7a4d",
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "大豆病害识别",
+    "backgroundColor": "#f4f8f5",
+    "enablePullDownRefresh": false
+  },
+  "tabBar": {
+    "color": "#8a9a90",
+    "selectedColor": "#1f7a4d",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "识别", "iconPath": "assets/scan.png", "selectedIconPath": "assets/scan-on.png" },
+      { "pagePath": "pages/library/library", "text": "病害图鉴", "iconPath": "assets/book.png", "selectedIconPath": "assets/book-on.png" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

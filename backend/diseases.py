@@ -1,0 +1,187 @@
+# -*- coding: utf-8 -*-
+"""大豆病害知识库：模型可识别类别 + 常见病害科普。
+模型实际预测的类别见 CLASS_INFO 中的 model_index（None 表示仅作科普，不由当前模型预测）。
+"""
+
+# 模型输出类别（顺序必须与训练时 class_names 一致，由 prepare_data.py 生成 classes.json 覆盖）
+MODEL_CLASSES = [
+    "Bacterial_blight",
+    "Frogeye",
+    "Healthy",
+    "Soyabean_rust",
+]
+
+CLASS_INFO = {
+    "Healthy": {
+        "name_zh": "健康叶片",
+        "name_en": "Healthy",
+        "pathogen": "无",
+        "type": "正常",
+        "is_disease": False,
+        "symptoms": "叶片呈均匀深绿色，表面纹理完整，无病斑、无褪色、无畸形。",
+        "confusion": "注意与早期病斑区分：早期锈病叶片正面可能仅见零星褪绿小点，需翻看叶背确认。",
+        "control": [
+            "保持田间通风透光，合理密植。",
+            "均衡施肥，避免偏施氮肥导致徒长。",
+            "定期巡查，早发现早处理。"
+        ],
+        "color": "#2e9e5b",
+        "emoji": "🌿"
+    },
+    "Bacterial_blight": {
+        "name_zh": "细菌性角斑病",
+        "name_en": "Bacterial Blight",
+        "pathogen": "大豆假单胞菌 Pseudomonas savastanoi pv. glycinea",
+        "type": "细菌性病害",
+        "is_disease": True,
+        "symptoms": "叶片初现水渍状小点，后扩展为褐色病斑；因受叶脉限制，病斑呈多角形，周围常有黄色晕圈。潮湿时病斑背面可溢出菌脓。",
+        "confusion": "与蛙眼叶斑病区别：角斑病病斑受叶脉限制呈多角形、较小；蛙眼病斑圆形、中央灰白似蛙眼。",
+        "control": [
+            "选用抗病品种，播种前进行种子处理。",
+            "避免雨天或露水未干时下田操作，减少传播。",
+            "合理排灌，降低田间湿度。",
+            "发病初期可选用铜制剂（如氢氧化铜）或春雷霉素等细菌性药剂防治。"
+        ],
+        "color": "#d98a1f",
+        "emoji": "🍂"
+    },
+    "Frogeye": {
+        "name_zh": "蛙眼叶斑病",
+        "name_en": "Frogeye Leaf Spot",
+        "pathogen": "大豆尾孢菌 Cercospora sojina",
+        "type": "真菌性病害",
+        "is_disease": True,
+        "symptoms": "叶片出现圆形至近圆形病斑，中央灰白至浅褐色，边缘暗褐或紫褐色，形似蛙眼，直径约3—10毫米。严重时病斑融合，叶片早枯。",
+        "confusion": "与细菌性角斑病区别：蛙眼病斑圆形、中央灰白明显；角斑病斑多角形、无灰白中心。",
+        "control": [
+            "选用抗病品种（最经济有效措施）。",
+            "实行2年以上轮作，清除病残体并深翻。",
+            "合理密植，增施磷钾肥提高抗病力。",
+            "发病初期喷施苯醚甲环唑、戊唑醇或嘧菌酯等杀菌剂。"
+        ],
+        "color": "#b5682a",
+        "emoji": "🍁"
+    },
+    "Soyabean_rust": {
+        "name_zh": "大豆锈病",
+        "name_en": "Soybean Rust",
+        "pathogen": "豆薯层锈菌 Phakopsora pachyrhizi",
+        "type": "真菌性病害",
+        "is_disease": True,
+        "symptoms": "叶片正面出现褪绿黄白色小点，对应背面产生黄褐色至红褐色粉疱（夏孢子堆），破裂后散出锈色粉末。严重时叶片迅速枯黄脱落，造成大幅减产。",
+        "confusion": "重点翻看叶背：叶背出现黄褐色粉疱是锈病的关键特征，正面褪绿点易与营养缺乏混淆。",
+        "control": [
+            "选用抗病品种，适期早播避开病害高发期。",
+            "合理密植、通风降湿，避免偏施氮肥。",
+            "从下部叶开始发病时及时喷药，可选用戊唑醇、苯醚甲环唑、丙环唑等三唑类药剂。",
+            "锈病流行性强，需关注当地植保部门预报，联防联控。"
+        ],
+        "color": "#a8442a",
+        "emoji": "🍄"
+    },
+    # 以下为常见病害科普，当前模型未训练，仅供知识展示
+    "Septoria_Brown_Spot": {
+        "name_zh": "褐斑病（壳针孢叶斑病）",
+        "name_en": "Septoria Brown Spot",
+        "pathogen": "大豆壳针孢菌 Septoria glycines",
+        "type": "真菌性病害",
+        "is_disease": True,
+        "model_index": None,
+        "symptoms": "下部叶片先出现褐色小斑，后扩展为不规则褐色病斑，叶脉间变黄，病斑上可见小黑点（分生孢子器），严重时叶片脱落。",
+        "confusion": "多从下部老叶向上发展，与锈病从中下部快速蔓延不同。",
+        "control": ["轮作与清除病残体。", "合理密植、降低田间湿度。", "发病初期用代森锰锌、苯醚甲环唑等药剂。"],
+        "color": "#8a5a2b", "emoji": "🍂"
+    },
+    "Cercospora_Leaf_Blight": {
+        "name_zh": "尾孢叶斑病（紫斑病）",
+        "name_en": "Cercospora Leaf Blight",
+        "pathogen": "大豆尾孢菌 Cercospora kikuchii",
+        "type": "真菌性病害",
+        "is_disease": True,
+        "model_index": None,
+        "symptoms": "叶片（尤其上层叶）出现紫红色至青铜色变色，叶脉呈紫红色，荚和种子也可受害，后期叶片枯萎卷曲。",
+        "confusion": "紫红色变色主要出现在叶片上表面和叶脉，与其他叶斑病的点状病斑不同。",
+        "control": ["选用抗病品种。", "轮作、清除病残体。", "开花结荚期注意监测，必要时喷施杀菌剂。"],
+        "color": "#7d3c6a", "emoji": "🍇"
+    },
+    "Sudden_Death_Syndrome": {
+        "name_zh": "猝死综合征（SDS）",
+        "name_en": "Sudden Death Syndrome",
+        "pathogen": "腐皮镰孢菌 Fusarium virguliforme",
+        "type": "真菌性（土传）病害",
+        "is_disease": True,
+        "model_index": None,
+        "symptoms": "叶脉间出现黄化并逐渐坏死，而叶脉保持绿色，形成鲜明对比；随后叶片脱落、植株突然死亡。根部腐烂，茎基部维管束变褐。",
+        "confusion": "叶脉间黄化、叶脉绿色是典型特征，易与缺素症混淆，需结合根部症状判断。",
+        "control": ["选用抗病耐病品种（关键措施）。", "改善排水、避免土壤板结积水。", "轮作玉米等禾本科作物。", "防治线虫、控制地下害虫。"],
+        "color": "#8f6b1f", "emoji": "🥀"
+    },
+    "Mosaic_Virus": {
+        "name_zh": "花叶病毒病",
+        "name_en": "Soybean Mosaic Virus",
+        "pathogen": "大豆花叶病毒 SMV（蚜虫传播）",
+        "type": "病毒性病害",
+        "is_disease": True,
+        "model_index": None,
+        "symptoms": "叶片出现深浅绿相间的花叶斑驳，叶面皱缩、卷曲，植株矮化，豆荚减少、粒重下降。",
+        "confusion": "花叶斑驳与黄化不同，常伴随叶片皱缩畸形。",
+        "control": ["选用无毒种子和抗病品种。", "及时防治蚜虫等传播媒介。", "清除田间杂草和病株。"],
+        "color": "#5f8f2a", "emoji": "🍃"
+    },
+    "Powdery_Mildew": {
+        "name_zh": "白粉病",
+        "name_en": "Powdery Mildew",
+        "pathogen": "大豆白粉菌 Erysiphe glycines",
+        "type": "真菌性病害",
+        "is_disease": True,
+        "model_index": None,
+        "symptoms": "叶片、茎和荚表面覆盖白色粉状物，后期可变为灰白色或褐色，叶片卷曲枯萎。",
+        "confusion": "白色粉状物可抹去，是与其他叶斑病最直观的区别。",
+        "control": ["选用抗病品种。", "合理施肥、通风透光。", "发病初期用三唑酮、戊唑醇或嘧菌酯防治。"],
+        "color": "#9a9a9a", "emoji": "⚪"
+    },
+    "Target_Spot": {
+        "name_zh": "靶斑病",
+        "name_en": "Target Spot",
+        "pathogen": "大豆生褐斑菌 Corynespora cassiicola",
+        "type": "真菌性病害",
+        "is_disease": True,
+        "model_index": None,
+        "symptoms": "叶片出现圆形褐色病斑，具同心轮纹，形似靶心，中央色浅、边缘深褐，严重时病斑融合导致叶片枯死。",
+        "confusion": "同心轮纹（靶心状）是关键识别特征。",
+        "control": ["轮作、清除病残体。", "合理密植降湿。", "发病初期用咪鲜胺、苯醚甲环唑等药剂。"],
+        "color": "#96572c", "emoji": "🎯"
+    },
+    "Downy_Mildew": {
+        "name_zh": "霜霉病",
+        "name_en": "Downy Mildew",
+        "pathogen": "大豆霜霉菌 Peronospora manshurica",
+        "type": "真菌性病害",
+        "is_disease": True,
+        "model_index": None,
+        "symptoms": "叶片正面出现淡黄色至黄绿色不规则斑，背面产生灰白色至淡紫色霜状霉层，严重时叶片干枯。",
+        "confusion": "叶背霜状霉层是霜霉病特征，与锈病的黄褐粉疱不同。",
+        "control": ["选用抗病品种、种子处理。", "轮作、清除病残体。", "发病初期用甲霜灵、霜脲氰等药剂。"],
+        "color": "#7a6fa8", "emoji": "🌫️"
+    }
+}
+
+
+def get_info(cls_name):
+    """根据模型类别名取知识信息，做别名兼容。"""
+    aliases = {
+        "Bacterial_blight": "Bacterial_blight",
+        "Bacterial Blight": "Bacterial_blight",
+        "bacterial_blight": "Bacterial_blight",
+        "Frogeye": "Frogeye",
+        "frogeye": "Frogeye",
+        "Frog_eye": "Frogeye",
+        "Healthy": "Healthy",
+        "healthy": "Healthy",
+        "Soyabean_rust": "Soyabean_rust",
+        "soybean_rust": "Soyabean_rust",
+        "Soybean_rust": "Soyabean_rust",
+        "Rust": "Soyabean_rust",
+    }
+    key = aliases.get(cls_name, cls_name)
+    return CLASS_INFO.get(key, None)

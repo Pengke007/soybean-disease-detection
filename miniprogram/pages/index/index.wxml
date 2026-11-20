@@ -1,0 +1,62 @@
+<view class="page">
+  <view class="hero">
+    <view class="brand">🌱 SoyGuard 大豆病害识别</view>
+    <view class="hero-title">拍一张叶片，\n识别大豆病害</view>
+    <view class="hero-sub">深度学习识别 · 常见病害覆盖 · 科学防治建议</view>
+  </view>
+
+  <view class="card">
+    <view class="title" style="margin-bottom:8rpx">📷 选择叶片照片</view>
+    <view class="sub" style="margin-bottom:24rpx">拍照或从相册选择清晰的叶片特写</view>
+    <view class="upload" bindtap="chooseImage" wx:if="{{!imagePath}}">
+      <view class="upload-icon">🌿</view>
+      <view class="upload-t">点击拍照 / 选择图片</view>
+      <view class="upload-s">支持 JPG、PNG 格式</view>
+    </view>
+    <image class="preview" src="{{imagePath}}" mode="aspectFit" wx:if="{{imagePath}}"></image>
+    <view class="btns" wx:if="{{imagePath}}">
+      <button class="btn-primary" bindtap="detect" loading="{{loading}}" disabled="{{loading}}">{{loading ? '识别中...' : '🔍 开始识别'}}</button>
+      <button class="btn-ghost" bindtap="clearImage">重选</button>
+    </view>
+    <view class="tip">💡 建议选择症状典型、对焦清晰的叶片；疑似锈病请同时拍叶片背面。</view>
+  </view>
+
+  <view class="card result" wx:if="{{result}}">
+    <view class="title" style="margin-bottom:20rpx">📋 识别结果
+      <text class="demo-tag" wx:if="{{result.mode === 'demo'}}">演示模式</text>
+    </view>
+    <view class="diag">
+      <view class="diag-emoji">{{result.detail.emoji}}</view>
+      <view class="diag-info">
+        <view class="diag-name">{{result.top.name_zh}}</view>
+        <view class="diag-en">{{result.detail.name_en}}</view>
+      </view>
+      <view class="diag-conf">
+        <view class="conf-num">{{result.top.confidence}}%</view>
+        <view class="conf-lab">置信度</view>
+      </view>
+    </view>
+    <view class="bar"><view class="bar-in" style="width:{{result.top.confidence}}%"></view></view>
+
+    <view class="block">
+      <view class="block-t">🔬 病原与类型</view>
+      <view class="block-c">{{result.detail.pathogen}} · {{result.detail.type}}</view>
+    </view>
+    <view class="block">
+      <view class="block-t">👀 症状识别要点</view>
+      <view class="block-c">{{result.detail.symptoms}}</view>
+    </view>
+    <view class="block" wx:if="{{result.detail.confusion}}">
+      <view class="block-t">⚖️ 易混淆区分</view>
+      <view class="block-c">{{result.detail.confusion}}</view>
+    </view>
+    <view class="block">
+      <view class="block-t">💊 防治建议</view>
+      <view class="control-item" wx:for="{{result.detail.control}}" wx:key="*this">{{index + 1}}. {{item}}</view>
+    </view>
+    <view class="warn" wx:if="{{result.mode === 'demo'}}">⚠️ 当前为演示模式，结果仅供界面调试，不代表真实诊断。</view>
+    <button class="btn-ghost full" bindtap="goDetail" data-cls="{{result.top.class}}">查看完整病害档案 →</button>
+  </view>
+
+  <view class="disclaimer">识别结果仅供参考，田间确诊请咨询农技人员</view>
+</view>

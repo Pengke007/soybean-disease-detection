@@ -1,0 +1,17 @@
+<view class="page">
+  <view class="lib-head">
+    <view class="lib-title">🌾 大豆病害图鉴</view>
+    <view class="lib-sub">常见病害症状与防治要点一览</view>
+  </view>
+  <view class="list">
+    <view class="item" wx:for="{{list}}" wx:key="key" bindtap="goDetail" data-cls="{{item.key}}">
+      <view class="item-ic" style="background:{{item.color}}18">{{item.emoji}}</view>
+      <view class="item-main">
+        <view class="item-name">{{item.name_zh}}</view>
+        <view class="item-type">{{item.type}}</view>
+        <view class="item-desc">{{item.symptoms}}</view>
+      </view>
+      <view class="arrow">›</view>
+    </view>
+  </view>
+</view>

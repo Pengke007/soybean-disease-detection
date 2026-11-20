@@ -1,0 +1,27 @@
+<view class="page">
+  <view class="head" style="background:{{info.color || '#1f7a4d'}}">
+    <view class="head-emoji">{{info.emoji || '🌿'}}</view>
+    <view class="head-name">{{info.name_zh || cls}}</view>
+    <view class="head-en">{{info.name_en || cls}}</view>
+    <view class="head-type">{{info.type || ''}}</view>
+  </view>
+  <view class="card">
+    <view class="block">
+      <view class="block-t">🔬 病原</view>
+      <view class="block-c">{{info.pathogen || '—'}}</view>
+    </view>
+    <view class="block">
+      <view class="block-t">👀 症状识别要点</view>
+      <view class="block-c">{{info.symptoms || '—'}}</view>
+    </view>
+    <view class="block" wx:if="{{info.confusion}}">
+      <view class="block-t">⚖️ 易混淆区分</view>
+      <view class="block-c">{{info.confusion}}</view>
+    </view>
+    <view class="block">
+      <view class="block-t">💊 防治建议</view>
+      <view class="control-item" wx:for="{{info.control}}" wx:key="*this">{{index + 1}}. {{item}}</view>
+    </view>
+  </view>
+  <view class="foot">档案来源：公开农业病害资料整理，仅供参考</view>
+</view>

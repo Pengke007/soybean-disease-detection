@@ -1,0 +1,10 @@
+.head { color: #fff; padding: 60rpx 40rpx 50rpx; text-align: center; }
+.head-emoji { font-size: 88rpx; }
+.head-name { font-size: 40rpx; font-weight: 700; margin-top: 12rpx; }
+.head-en { font-size: 24rpx; opacity: .85; margin-top: 6rpx; }
+.head-type { display: inline-block; font-size: 22rpx; background: rgba(255,255,255,.22); padding: 6rpx 20rpx; border-radius: 24rpx; margin-top: 16rpx; }
+.block { margin-bottom: 30rpx; }
+.block-t { font-size: 28rpx; font-weight: 700; padding-left: 16rpx; border-left: 6rpx solid #1f7a4d; margin-bottom: 12rpx; }
+.block-c { font-size: 27rpx; color: #4b5a51; line-height: 1.75; }
+.control-item { font-size: 27rpx; color: #4b5a51; line-height: 1.75; margin: 10rpx 0; }
+.foot { text-align: center; font-size: 20rpx; color: #a5b3aa; padding: 30rpx; }
