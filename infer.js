@@ -4,9 +4,42 @@
 const ORT_WASM_DIR = "ort/";
 let ortSession = null;
 let KB = null;
+let _fetchPatched = false;
+
+// onnxruntime-web 内部用全局 fetch() 加载 .wasm。GitHub Pages 不对二进制做
+// gzip，导致 10MB 的 wasm 原样下载很慢。这里拦截 .wasm 请求，改取体积仅 1/4
+// 的 .wasm.gz，用浏览器原生 DecompressionStream 解压后交回 ORT。
+// 不支持 DecompressionStream 的浏览器自动走原始 .wasm，功能不受影响。
+function patchFetchForWasmGzip() {
+  if (_fetchPatched || typeof DecompressionStream === "undefined") return;
+  _fetchPatched = true;
+  const nativeFetch = window.fetch.bind(window);
+  window.fetch = async function (input, init) {
+    const url = typeof input === "string" ? input : (input && input.url) || "";
+    // 只拦截本地 ort 目录下的 .wasm 请求（URL 以 .wasm 结尾）
+    if (url.endsWith(".wasm")) {
+      try {
+        const gzRes = await nativeFetch(url + ".gz", init);
+        if (gzRes.ok) {
+          const ds = new DecompressionStream("gzip");
+          const stream = gzRes.body.pipeThrough(ds);
+          // 保留 200 状态与 wasm MIME，供 instantiateStreaming 使用
+          return new Response(stream, {
+            status: 200,
+            headers: { "Content-Type": "application/wasm" },
+          });
+        }
+      } catch (_) {
+        // 解压或请求失败则回退到原始 .wasm
+      }
+    }
+    return nativeFetch(input, init);
+  };
+}
 
 async function initModel() {
   if (ortSession) return ortSession;
+  patchFetchForWasmGzip();
   ort.env.wasm.wasmPaths = ORT_WASM_DIR;
   // GitHub Pages 无 COOP/COEP 头，SharedArrayBuffer 不可用，强制单线程避免回退警告
   ort.env.wasm.numThreads = 1;
